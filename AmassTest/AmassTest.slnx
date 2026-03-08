@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="AmassTest.Api/AmassTest.Api.csproj" />
+  <Project Path="AmassTest.Application/AmassTest.Application.csproj" />
+  <Project Path="AmassTest.Domain/AmassTest.Domain.csproj" />
+  <Project Path="AmassTest.Infrastructure/AmassTest.Infrastructure.csproj" />
+</Solution>
