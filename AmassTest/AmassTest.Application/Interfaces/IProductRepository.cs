@@ -11,5 +11,8 @@ namespace AmassTest.Application.Interfaces
         Task AddAsync(Product product);
         Task DeleteAsync(int id);
         Task<List<Product>> GetAllAsync();
+        Task<List<Product>> SearchByKeywordAsync(string keyword);
+
+        Task<bool> ExistsByCodeAsync(string code);
     }
 }

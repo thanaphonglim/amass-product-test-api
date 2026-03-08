@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace AmassTest.Application.Common.Helpers
+﻿namespace AmassTest.Application.Common.Helpers
 {
     public static class ProductCodeFormatter
     {

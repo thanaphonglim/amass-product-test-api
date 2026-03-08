@@ -1,6 +1,7 @@
 ﻿using AmassTest.Application.Features.Products.CreateProduct;
 using AmassTest.Application.Features.Products.DeleteProduct;
 using AmassTest.Application.Features.Products.GetProducts;
+using AmassTest.Application.Features.Products.SearchProducts;
 
 namespace AmassTest.Api.Endpoints
 {
@@ -19,7 +20,14 @@ namespace AmassTest.Api.Endpoints
             group.MapGet("/", async (
                 GetProductsHandler handler) =>
             {
-                return await handler.Handle();
+                return Results.Ok(await handler.Handle());
+            });
+
+            group.MapGet("search", async (
+                [AsParameters] SearchProductQuery query,
+                SearchProductsHandler handler) =>
+            {
+                return Results.Ok(await handler.Handle(query));
             });
 
             group.MapDelete("/{id}", async (

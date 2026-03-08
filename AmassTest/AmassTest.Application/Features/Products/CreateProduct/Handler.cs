@@ -1,8 +1,7 @@
-﻿using AmassTest.Application.Interfaces;
+﻿using AmassTest.Application.Common.Exceptions;
+using AmassTest.Application.Interfaces;
 using AmassTest.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using Microsoft.EntityFrameworkCore;
 
 namespace AmassTest.Application.Features.Products.CreateProduct
 {
@@ -16,11 +15,18 @@ namespace AmassTest.Application.Features.Products.CreateProduct
 
         public async Task Handle(CreateProductCommand command)
         {
-            var product = new Product
+            int retry = 5;
+            while (retry-- > 0)
             {
-                ProductCode = command.productCode.Replace("-", "")
-            };
-            await _repository.AddAsync(product);
+                var product = Product.Create();
+
+                try
+                {
+                    await _repository.AddAsync(product);
+                    return;
+                }
+                catch (DuplicateProductCodeException){}
+            }
         }
     }
 }

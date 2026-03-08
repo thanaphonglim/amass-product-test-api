@@ -4,5 +4,5 @@ using System.Text;
 
 namespace AmassTest.Application.Features.Products.CreateProduct
 {
-    public record CreateProductCommand(string productCode);
+    public record CreateProductCommand();
 }

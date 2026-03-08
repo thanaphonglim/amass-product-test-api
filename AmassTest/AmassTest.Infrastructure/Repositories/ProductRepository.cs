@@ -1,6 +1,10 @@
-﻿using AmassTest.Application.Features.Products.DeleteProduct;
+﻿using AmassTest.Application.Common.Exceptions;
+using AmassTest.Application.Common.Helpers;
+using AmassTest.Application.Features.Products.DeleteProduct;
 using AmassTest.Application.Interfaces;
 using AmassTest.Domain.Entities;
+using AmassTest.Infrastructure.Data.AppDbContext;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
@@ -10,27 +14,55 @@ namespace AmassTest.Infrastructure.Repositories
 {
     public class ProductRepository : IProductRepository
     {
-        private static readonly List<Product> _products = new();
-
-        public Task AddAsync(Product product)
+        private readonly AppDbContext _context;
+        public ProductRepository(AppDbContext context)
         {
-            product.Id = _products.Any() ? _products.Max(x => x.Id) + 1 : 1;
-            _products.Add(product);
-            return Task.CompletedTask;
+            _context = context;
         }
 
-        public Task DeleteAsync(int id)
+        public async Task AddAsync(Product product)
         {
-            var p = _products.FirstOrDefault(x => x.Id == id);
+            try
+            {
+                await _context.Products.AddAsync(product);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                if (DbExceptionHelper.IsUniqueConstraintViolation(ex))
+                    throw new DuplicateProductCodeException();
+                throw;
+            }
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            var p = await _context.Products.FirstOrDefaultAsync(x => x.Id == id);
             if (p != null)
-                _products.Remove(p);
-
-            return Task.CompletedTask;
+            {
+                _context.Products.Remove(p);
+                await _context.SaveChangesAsync();
+            }
         }
 
-        public Task<List<Product>> GetAllAsync()
+        public async Task<List<Product>> GetAllAsync()
         {
-            return Task.FromResult(_products);
+            return await _context.Products.ToListAsync();
+        }
+
+        public async Task<List<Product>> SearchByKeywordAsync(string keyword)
+        {
+            keyword = keyword.Replace("-", "").ToLower();
+            var result = await _context.Products
+                .Where(p => p.ProductCode.ToLower().Contains(keyword))
+                .ToListAsync();
+
+            return result;
+        }
+
+        public async Task<bool> ExistsByCodeAsync(string code)
+        {
+            return await _context.Products.AnyAsync(p => p.ProductCode == code);
         }
     }
 }

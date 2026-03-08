@@ -21,6 +21,8 @@ namespace AmassTest.Infrastructure.Data.AppDbContext
                 entity.Property(p => p.ProductCode)
                       .IsRequired()
                       .HasMaxLength(16);
+                entity.HasIndex(p => p.ProductCode)
+                      .IsUnique();
             });
         }
     }
